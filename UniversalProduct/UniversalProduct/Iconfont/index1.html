@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <style>
+            body{
+                background-color:paleturquoise;
+            }
+
+            button{
+                border:0;
+                width: 150px;
+                height: 35px;
+                background-color: orangered;
+                color: white;
+                font-size: 16px;
+                border-radius: 6px;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <h2>JS调用OC中的方法</h2>
+        <p id="content"></p>
+        <button id="btn">设置导航栏</button>
+        <button id="btn1">设置菜单栏数据</button>
+        <button id="btn2">文件预览</button>
+        <button id="btn9">播放视频</button>
+        <button id="btn3">退出登录</button>
+        <button id="btn4">回到主页</button>
+        <button id="btn5">获取版本信息</button>
+        <button id="btn6">获取用户信息</button>
+        <button id="btn7">获取地理位置信息</button>
+        <button id="btn8">打电话</button>
+        <button id="btn10">打开网页</button>
+        <button id="btn11">显示TabBar</button>
+        <button id="btn12">隐藏TabBar</button>
+        <button id="btn13">设置progress</button>
+        <button id="btn14">提示消息</button>
+        <button id="btn15">选中第三个item</button>
+        <h2>获取从app发送的内容</h2>
+        <p id="appData"></p>
+        <input type="text" />
+<!--        <iframe frameborder=0 width=170 height=100 marginheight=0 marginwidth=0 scrolling=no src=http://www.163.com></iframe>-->
+    </body>
+    <script>
+       // 这段代码是固定的，必须要放到js中
+       function setupWebViewJavascriptBridge(callback) {
+            if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+            if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+            window.WVJBCallbacks = [callback];
+            var WVJBIframe = document.createElement('iframe');
+            WVJBIframe.style.display = 'none';
+            WVJBIframe.src = 'wvjbscheme://__BRIDGE_LOADED__';
+            document.documentElement.appendChild(WVJBIframe);
+            setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+        }
+    
+        // 与OC交互的所有JS方法都要在这里注册,才能让OC和JS之间相互调用
+       setupWebViewJavascriptBridge(function(bridge) {
+           /* JS给OC提供公开的API, 在OC中可以手动调用此API, 并且可以接收OC中传过来的参数,同时可回调OC */
+
+           // 获取用户信息
+           bridge.registerHandler('goBack', function(data, responseCallback) {
+               console.log("OC中传递过来的参数:", data);
+               // 把处理好的结果返回给OC
+               document.getElementById('content').innerHTML = 'goBack:' + JSON.stringify(data);
+           });
+                                    
+           bridge.registerHandler('setPopViewItemData', function(data, responseCallback) {
+                console.log("OC中传递过来的参数:", data);
+                document.getElementById('content').innerHTML = 'setPopViewItemData:' + JSON.stringify(data);
+           });
+            
+           bridge.registerHandler('selectMenuItem', function(data, responseCallback) {
+                console.log("OC中传递过来的参数:", data);
+                document.getElementById('content').innerHTML = 'selectMenuItem:' + JSON.stringify(data);
+           });
+                                    
+           bridge.registerHandler('selectTabBarItem', function(data, responseCallback) {
+                console.log("OC中传递过来的参数:", data);
+                document.getElementById('content').innerHTML = 'selectTabBarItem:' + JSON.stringify(data);
+                });
+
+           //  弹框输出
+           bridge.registerHandler('keyboardShow', function(data, responseCallback) {
+                document.getElementById('content').innerHTML = 'keyboardShow:' + JSON.stringify(data);
+           });
+
+           //  动态跳转到京东商城
+           bridge.registerHandler('keyboardHidden', function(data, responseCallback) {
+               document.getElementById('content').innerHTML = 'keyboardHidden:' + JSON.stringify(data);
+           });
+                                    
+           bridge.registerHandler('setPushInfo', function(data, responseCallback)
+           {
+                 document.getElementById('content').innerHTML = 'setPushInfo:' + JSON.stringify(data);
+           });
+                                    
+           bridge.registerHandler('setListData', function(data, responseCallback)
+           {
+                 document.getElementById('content').innerHTML = 'setListData:' + JSON.stringify(data);
+           });
+
+
+                                    
+           // 调用OC中的打开相册方法
+           document.getElementById('btn').onclick = function () {
+                   bridge.callHandler('setNavigationItem', {'isShow':true, 'pageTitle':'title', 'rightItem':{'type':'text','content':'pop','action':'popview','data':{'text':'aaa'}},'leftItem':{'type':'image','content':'pop','action':'menu','data':{'text':'aaa'}}}, function responseCallback(responseData) {
+                   console.log("OC中返回的参数:", responseData)
+                   document.getElementById('appData').innerHTML = 'setNavigationItem:' + JSON.stringify(responseData);
+               });
+           };
+           document.getElementById('btn1').onclick = function () {
+                   bridge.callHandler('setMenuItemData', [{'icon':0xe602,'title':'我的钱包','defaultField':{'location':'section.html'},'child':[{'icon':0xe602,'title':'金额','defaultField':{'location':'money.html'}},{'icon':0xe602,'title':'充值','defaultField':{'location':'charge.html'}}]},{'icon':0xe602,'title':'我的消息','defaultField':{'location':'news.html'},'child':[{'icon':0xe602,'title':'历史消息','defaultField':{'location':'history.html'}},{'icon':0xe602,'title':'未读消息','defaultField':{'location':'NoReading.html'}}]}], function responseCallback(responseData) {
+                           console.log("OC中返回的参数:", responseData);
+                           document.getElementById('appData').innerHTML = 'setMenuItemData:' + JSON.stringify(responseData);
+                        });
+           };
+           document.getElementById('btn9').onclick = function () {
+                                    
+                    bridge.callHandler('playVideo', {'fileType':'video','url':'http://v1.mukewang.com/a45016f4-08d6-4277-abe6-bcfd5244c201/L.mp4','title':'**视频'}, function responseCallback(responseData) {
+                           console.log("OC中返回的参数:", responseData);
+                           document.getElementById('appData').innerHTML = 'playVideo:' + JSON.stringify(responseData);
+                           });
+                     };
+<!--                     document.getElementById('btn2').onclick = function () {-->
+<!--                             bridge.callHandler('filePreviewer', [{'fileType':'pdf','url':'http://www.163.com','title':'**合同'}], function responseCallback(responseData) {-->
+<!--                                        console.log("OC中返回的参数:", responseData);-->
+<!--                                                       document.getElementById('appData').innerHTML = 'filePreviewer:' + JSON.stringify(responseData);-->
+<!--                                        });-->
+<!--                                    -->
+<!--                      };-->
+                                    document.getElementById('btn2').onclick = function () {
+                                    bridge.callHandler('filePreviewer', [{'fileType':'pdf','url':'http://wiki.lbsyun.baidu.com/cms/logo/lbsyunlogo296-120.png','title':'**合同'},{'fileType':'image','url':'http://wiki.lbsyun.baidu.com/cms/logo/lbsyunlogo296-120.png','title':'**合同'}], function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'filePreviewer:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+
+
+                                    document.getElementById('btn3').onclick = function () {
+                                    bridge.callHandler('loginout',{'alert':false}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'loginout:' + JSON.stringify(responseData);
+                                                       });
+                                    };
+                                    document.getElementById('btn4').onclick = function () {
+                                    bridge.callHandler('goHome',{}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'goHome:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+                                    document.getElementById('btn5').onclick = function () {
+                                    bridge.callHandler('getVersionInfo',{}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'getVersionInfo:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+                                    
+                                    document.getElementById('btn6').onclick = function () {
+                                    bridge.callHandler('getUserInfo',{}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'getUserInfo:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+                                    
+                                    document.getElementById('btn7').onclick = function () {
+                                    bridge.callHandler('getLocation',{}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'getLocation:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+                                    document.getElementById('btn8').onclick = function () {
+                                    bridge.callHandler('callPlatform',{'type':'tel','value':'13567193215'}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData);
+                                                       document.getElementById('appData').innerHTML = 'callPlatform:' + JSON.stringify(responseData);
+                                                       });
+                                    
+                                    };
+                                    
+                                    document.getElementById('btn10').onclick = function () {
+                                    bridge.callHandler('presentWebView', {'title':'百度一下', 'url':'https://d.glpfin.com/app/main.html'}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'setNavigationItem:' + JSON.stringify(responseData);
+                                                       });
+                                    setTimeout(function(){
+                                               bridge.callHandler('closeWebView', {}, function responseCallback(responseData) {
+                                                                  console.log("OC中返回的参数:", responseData)
+                                                                  document.getElementById('appData').innerHTML = 'closeWebView:' + JSON.stringify(responseData);
+                                                                  });
+                                               },2000);
+                                    };
+                                    
+                                    document.getElementById('btn11').onclick = function () {
+                                    bridge.callHandler('setTabBar', {'isShow':true,'items':[{'icon':0xe602,'title':'待审核','imageSize':25,'color':'#AAAAAA','selectedColor':'#00AFEF','tag':1,'defaultField':{'tag':1}},{'icon':0xe6d5,'title':'已审核','imageSize':25,'color':'#AAAAAA','selectedColor':'#00AFEF','tag':2,'defaultField':{'tag':2}},{'icon':0xe613,'title':'消息','imageSize':25,'color':'#AAAAAA','selectedColor':'#00AFEF','tag':3,'defaultField':{'tag':3}},{'icon':0xe611,'title':'我的','imageSize':25,'color':'#AAAAAA','selectedColor':'#00AFEF','tag':4,'defaultField':{'tag':4}}]}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'setTabBar:' + JSON.stringify(responseData);
+                                                       });
+                                    };
+                                    document.getElementById('btn12').onclick = function () {
+                                    bridge.callHandler('setTabBar', {'isShow':false}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'setTabBar:' + JSON.stringify(responseData);
+                                                       });
+                                    };
+                                    
+                                    document.getElementById('btn13').onclick = function () {
+                                    bridge.callHandler('setProgress', {'progress':50}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'setProgress:' + JSON.stringify(responseData);
+                                                       });
+                                    setTimeout(function(){
+                                               bridge.callHandler('setProgress', {'progress':100}, function responseCallback(responseData) {
+                                                                  console.log("OC中返回的参数:", responseData)
+                                                                  document.getElementById('appData').innerHTML = 'setProgress:' + JSON.stringify(responseData);
+                                                                  });
+                                               },2000);
+                                    };
+                                    
+                                    document.getElementById('btn14').onclick = function () {
+                                    bridge.callHandler('showMsg', {'msg':'提示信息'}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'showMsg:' + JSON.stringify(responseData);
+                                                       });
+                                    };
+                                    
+                                    document.getElementById('btn15').onclick = function () {
+                                    bridge.callHandler('willSelectTabBarItem', {'tag':3}, function responseCallback(responseData) {
+                                                       console.log("OC中返回的参数:", responseData)
+                                                       document.getElementById('appData').innerHTML = 'willSelectTabBarItem:' + JSON.stringify(responseData);
+                                                       });
+                                    };
+                                    
+                                    
+       })
+    </script>
+</html>

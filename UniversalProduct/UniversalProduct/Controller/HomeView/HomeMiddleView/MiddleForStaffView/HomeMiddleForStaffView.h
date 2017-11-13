@@ -1,0 +1,23 @@
+//
+//  HomeMiddleForStaffView.h
+//  UniversalProduct
+//
+//  Created by 鲍利成 on 2017/7/18.
+//  Copyright © 2017年 鲍利成. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+@protocol HomeMiddleForStaffViewProtocol <NSObject>
+-(void)pushToWebPage;
+@end
+@interface HomeMiddleForStaffView : UIView
+@property(nonatomic, assign) id<HomeMiddleForStaffViewProtocol> delegate;
+-(void)setFinanceLeaseTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+-(void)setFactoryTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+-(void)setColdChainsTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+-(void)setAuthorizedLoanTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+-(void)setCrossBusinessTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+-(void)setInternetLoanTotalUseCredit:(double)useCredit totalCurrentMonthUseCredit:(double)totalCurrentMonthUseCredit totalOverdueAmount:(double)totalOverdueAmount;
+
+-(void)setSortList:(NSArray *)list;
+@end
